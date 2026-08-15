@@ -460,7 +460,7 @@ export function Canvas({
       }
       if (!drag.current) return;
       drag.current = null;
-      container.style.cursor = "grab";
+      container.style.cursor = "";
       schedule();
     };
 

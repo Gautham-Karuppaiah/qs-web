@@ -100,6 +100,7 @@ function ViewerFile({
 
   const [tool, setTool] = useState<Tool>("pan");
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [noEntry, setNoEntry] = useState(false);
   const [box, setBox] = useState<Box | null>(null);
   const [label, setLabel] = useState("");
   const [polygon, setPolygon] = useState<Pt[] | null>(null);
@@ -189,6 +190,7 @@ function ViewerFile({
   };
 
   const pickTool = (next: Tool) => {
+    if (next === "mark" && !activeId) return setNoEntry(true);
     clearBand();
     setPolygon(null);
     setTool(next);
@@ -291,7 +293,11 @@ function ViewerFile({
           <Button
             key={id}
             size="sm"
-            title={`${text} (${key})`}
+            title={
+              id === "mark" && !activeId
+                ? "Select a legend entry first."
+                : `${text} (${key})`
+            }
             disabled={(id === "mark" && !activeId) || !doc}
             variant={tool === id ? "default" : "outline"}
             onClick={() => pickTool(id)}
@@ -349,6 +355,11 @@ function ViewerFile({
             {mut.addEntry.error.message}
           </span>
         )}
+        {noEntry && !activeId && (
+          <span className="text-sm text-muted-foreground">
+            Select a legend entry first.
+          </span>
+        )}
 
       </header>
 
@@ -364,7 +375,7 @@ function ViewerFile({
                 key={tab}
                 type="button"
                 onClick={() => setLeftTab(tab)}
-                className={`flex-1 border-b-2 px-2 py-1 text-xs uppercase tracking-wide ${
+                className={`min-w-0 flex-1 truncate border-b-2 px-2 py-1 text-xs uppercase tracking-wide ${
                   leftTab === tab
                     ? "border-foreground font-medium"
                     : "border-transparent text-muted-foreground hover:bg-muted/60"
